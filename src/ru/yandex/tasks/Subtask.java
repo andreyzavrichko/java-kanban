@@ -1,4 +1,4 @@
-package ru.yandex;
+package ru.yandex.tasks;
 
 public class Subtask extends Task {
     private final Integer epicId;

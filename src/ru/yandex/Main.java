@@ -1,5 +1,11 @@
 package ru.yandex;
 
+import ru.yandex.manager.TaskManager;
+import ru.yandex.tasks.Epic;
+import ru.yandex.tasks.Status;
+import ru.yandex.tasks.Subtask;
+import ru.yandex.tasks.Task;
+
 public class Main {
 
     public static void main(String[] args) {

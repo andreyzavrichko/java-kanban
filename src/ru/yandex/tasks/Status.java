@@ -1,4 +1,4 @@
-package ru.yandex;
+package ru.yandex.tasks;
 
 public enum Status {
     NEW,

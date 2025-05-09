@@ -1,4 +1,4 @@
-package ru.yandex;
+package ru.yandex.tasks;
 
 import java.util.ArrayList;
 import java.util.List;

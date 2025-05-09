@@ -1,4 +1,9 @@
-package ru.yandex;
+package ru.yandex.manager;
+
+import ru.yandex.tasks.Epic;
+import ru.yandex.tasks.Status;
+import ru.yandex.tasks.Subtask;
+import ru.yandex.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +41,7 @@ public class TaskManager {
     public void deleteAllSubtasks() {
         for (Epic epic : epics.values()) {
             epic.clearSubtasks();
+            updateEpicStatus(epic);
         }
         subtasks.clear();
     }
@@ -71,15 +77,24 @@ public class TaskManager {
     }
 
     public void updateTask(Task task) {
+        if (task == null || !tasks.containsKey(task.getId())) {
+           throw new IllegalArgumentException("Task not found");
+        }
         tasks.put(task.getId(), task);
     }
 
     public void updateEpic(Epic epic) {
+        if (epic == null || !epics.containsKey(epic.getId())) {
+            throw new IllegalArgumentException("Epic not found");
+        }
         epics.put(epic.getId(), epic);
         updateEpicStatus(epic);
     }
 
     public void updateSubtask(Subtask subtask) {
+        if (subtask == null || !subtasks.containsKey(subtask.getId())) {
+            throw new IllegalArgumentException("Subtask not found");
+        }
         subtasks.put(subtask.getId(), subtask);
         Epic epic = epics.get(subtask.getEpicId());
         updateEpicStatus(epic);
