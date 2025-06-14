@@ -1,4 +1,4 @@
-package ru.yandex.test.tasks;
+package tasks;
 
 
 import org.junit.jupiter.api.Test;

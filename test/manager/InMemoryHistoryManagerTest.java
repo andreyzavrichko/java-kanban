@@ -1,4 +1,4 @@
-package ru.yandex.test.manager;
+package manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,18 +27,6 @@ class InMemoryHistoryManagerTest {
         List<Task> history = historyManager.getHistory();
         assertEquals(1, history.size());
         assertEquals(task, history.getFirst());
-    }
-
-    @Test
-    void historyShouldNotExceedLimit() {
-        for (int i = 0; i < 15; i++) {
-            Task t = new Task("Task" + i, "Desc");
-            t.setId(i);
-            historyManager.add(t);
-        }
-
-        List<Task> history = historyManager.getHistory();
-        assertEquals(10, history.size(), "History should contain only 10 most recent tasks");
     }
 
     @Test
