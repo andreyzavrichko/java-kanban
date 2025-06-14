@@ -1,4 +1,4 @@
-package ru.yandex.tests.manager;
+package test.java.ru.yandex.test.manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
