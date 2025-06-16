@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private static final int HISTORY_LIMIT = 10;
-    private final List<Task> history = new ArrayList<>();
-    private Node head;
-    private Node tail;
-    private final Map<Integer, Node> nodeMap = new HashMap<>();
+
+
+    private Node<Task> head;
+    private Node<Task> tail;
+    private final Map<Integer, Node<Task>> nodeMap = new HashMap<>();
 
     @Override
     public void add(Task task) {
@@ -24,36 +24,26 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        Node node = nodeMap.remove(id);
+        Node<Task> node = nodeMap.remove(id);
         removeNode(node);
     }
 
     @Override
     public List<Task> getHistory() {
         List<Task> result = new ArrayList<>();
-        Node current = head;
+        Node<Task> current = head;
         while (current != null) {
-            result.add(current.task);
+            result.add(current.data);
             current = current.next;
         }
         return result;
     }
 
 
-    private static class Node {
-        Task task;
-        Node prev;
-        Node next;
 
-        Node(Node prev, Task task, Node next) {
-            this.task = task;
-            this.prev = prev;
-            this.next = next;
-        }
-    }
 
     private void linkLast(Task task) {
-        final Node newNode = new Node(tail, task, null);
+        final Node<Task> newNode = new Node<>(tail, task, null);
         if (tail != null) {
             tail.next = newNode;
         } else {
@@ -63,11 +53,11 @@ public class InMemoryHistoryManager implements HistoryManager {
         nodeMap.put(task.getId(), newNode);
     }
 
-    private void removeNode(Node node) {
+    private void removeNode(Node<Task> node) {
         if (node == null) return;
 
-        Node prev = node.prev;
-        Node next = node.next;
+        Node<Task> prev = node.prev;
+        Node<Task> next = node.next;
 
         if (prev != null) {
             prev.next = next;
@@ -82,5 +72,16 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
+    private static class Node<T> {
+        T data;
+        Node<T> prev;
+        Node<T> next;
+
+        Node(Node<T> prev, T data, Node<T> next) {
+            this.data = data;
+            this.prev = prev;
+            this.next = next;
+        }
+    }
 
 }
