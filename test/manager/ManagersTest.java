@@ -1,4 +1,4 @@
-package ru.yandex.tests.manager;
+package manager;
 
 import org.junit.jupiter.api.Test;
 import ru.yandex.manager.HistoryManager;
