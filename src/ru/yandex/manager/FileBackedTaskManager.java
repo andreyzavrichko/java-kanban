@@ -107,7 +107,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         );
     }
 
-    // Переопределим все модифицирующие методы:
     @Override
     public void addTask(Task task) {
         super.addTask(task);
