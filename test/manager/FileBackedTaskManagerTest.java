@@ -24,13 +24,6 @@ class FileBackedTaskManagerTest {
         manager = new FileBackedTaskManager(tempFile);
     }
 
-    @AfterEach
-    void tearDown() {
-        if (tempFile.exists()) {
-            tempFile.delete();
-        }
-    }
-
     @Test
     void shouldSaveAndLoadEmptyManager() {
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(tempFile);
@@ -71,7 +64,7 @@ class FileBackedTaskManagerTest {
 
         assertNotNull(loadedEpic, "Epic must be restored");
         assertEquals(2, loadedSubs.size(), "Should restore both subtasks");
-        assertEquals(sub1.getStatus(), loadedSubs.get(0).getStatus(), "Status must match");
+        assertEquals(sub1.getStatus(), loadedSubs.getFirst().getStatus(), "Status must match");
     }
 
     @Test
@@ -93,7 +86,7 @@ class FileBackedTaskManagerTest {
         t1.setId(1);
 
         memManager.addTask(t1);
-        fileManager.addTask(new Task("Задача", "Описание")); // будет ID = 1 тоже
+        fileManager.addTask(new Task("Задача", "Описание"));
 
         assertEquals(memManager.getAllTasks(), fileManager.getAllTasks(), "Обе реализации должны вести себя одинаково");
     }
