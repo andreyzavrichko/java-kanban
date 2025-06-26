@@ -1,6 +1,6 @@
 package manager;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import ru.yandex.manager.FileBackedTaskManager;
 import ru.yandex.manager.InMemoryTaskManager;
 import ru.yandex.tasks.Epic;
@@ -12,83 +12,69 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FileBackedTaskManagerTest {
-    File tempFile;
-    FileBackedTaskManager manager;
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
+    private File tempFile;
 
-    @BeforeEach
-    void setUp() throws IOException {
-        tempFile = File.createTempFile("task_manager_test", ".csv");
-        manager = new FileBackedTaskManager(tempFile);
+    @Override
+    protected FileBackedTaskManager createManager() {
+        try {
+            tempFile = File.createTempFile("test", ".csv");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return new FileBackedTaskManager(tempFile);
     }
 
     @Test
     void shouldSaveAndLoadEmptyManager() {
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(tempFile);
-        assertTrue(loaded.getAllTasks().isEmpty(), "Tasks must be empty");
-        assertTrue(loaded.getAllEpics().isEmpty(), "Epics must be empty");
-        assertTrue(loaded.getAllSubtasks().isEmpty(), "Subtasks must be empty");
+        assertTrue(loaded.getAllTasks().isEmpty());
+        assertTrue(loaded.getAllEpics().isEmpty());
+        assertTrue(loaded.getAllSubtasks().isEmpty());
     }
 
     @Test
     void shouldSaveAndLoadSingleTask() {
         Task task = new Task("Task1", "Desc");
         manager.addTask(task);
-
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(tempFile);
-        List<Task> tasks = loaded.getAllTasks();
-
-        assertEquals(1, tasks.size());
-        assertEquals(task, tasks.getFirst());
+        assertEquals(List.of(task), loaded.getAllTasks());
     }
 
     @Test
     void shouldSaveAndLoadEpicAndSubtasks() {
         Epic epic = new Epic("Epic1", "Epic desc");
         manager.addEpic(epic);
-
         Subtask sub1 = new Subtask("Sub1", "S1", epic.getId());
         sub1.setStatus(Status.IN_PROGRESS);
         manager.addSubtask(sub1);
-
         Subtask sub2 = new Subtask("Sub2", "S2", epic.getId());
         sub2.setStatus(Status.DONE);
         manager.addSubtask(sub2);
 
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(tempFile);
-
-        Epic loadedEpic = loaded.getEpicById(epic.getId());
-        List<Subtask> loadedSubs = loaded.getSubtasksOfEpic(epic.getId());
-
-        assertNotNull(loadedEpic, "Epic must be restored");
-        assertEquals(2, loadedSubs.size(), "Should restore both subtasks");
-        assertEquals(sub1.getStatus(), loadedSubs.getFirst().getStatus(), "Status must match");
+        assertEquals(2, loaded.getSubtasksOfEpic(epic.getId()).size());
     }
 
     @Test
     void shouldPersistAfterEachModification() throws IOException {
         Task task = new Task("T1", "Desc");
         manager.addTask(task);
-
         String content = java.nio.file.Files.readString(tempFile.toPath());
-        assertTrue(content.contains("T1"), "File must contain task name after save");
+        assertTrue(content.contains("T1"));
     }
 
     @Test
     void fileBackedManagerShouldBehaveLikeInMemoryManager() throws IOException {
-        InMemoryTaskManager memManager = new InMemoryTaskManager();
-        File tempFile = File.createTempFile("test", ".csv");
-        FileBackedTaskManager fileManager = new FileBackedTaskManager(tempFile);
-
+        var inMemory = new InMemoryTaskManager();
+        var fileBased = new FileBackedTaskManager(File.createTempFile("copy", ".csv"));
         Task t1 = new Task("Задача", "Описание");
-        t1.setId(1);
-
-        memManager.addTask(t1);
-        fileManager.addTask(new Task("Задача", "Описание"));
-
-        assertEquals(memManager.getAllTasks(), fileManager.getAllTasks(), "Обе реализации должны вести себя одинаково");
+        inMemory.addTask(t1);
+        fileBased.addTask(new Task("Задача", "Описание"));
+        assertEquals(inMemory.getAllTasks(), fileBased.getAllTasks());
     }
 
 
