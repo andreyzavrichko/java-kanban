@@ -30,9 +30,9 @@ public class FileBackedTaskManagerDemo {
             Epic epic2 = new Epic("Эпик без подзадач", "Описание эпика 2");
             manager.addEpic(epic2);
 
-            manager.getTaskById(task1.getId());
-            manager.getEpicById(epic1.getId());
-            manager.getSubtaskById(sub2.getId());
+            manager.getTaskById(task1.getId()).ifPresent(System.out::println);
+            manager.getEpicById(epic1.getId()).ifPresent(System.out::println);
+            manager.getSubtaskById(sub2.getId()).ifPresent(System.out::println);
 
             FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(file);
 
