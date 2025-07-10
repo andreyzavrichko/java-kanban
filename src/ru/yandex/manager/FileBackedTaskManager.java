@@ -58,13 +58,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 } else {
                     manager.tasks.put(task.getId(), task);
                 }
+
+                if (task.getStartTime() != null) {
+                    manager.getPrioritizedTasks().add(task);
+                }
+
                 manager.idCounter = Math.max(manager.idCounter, task.getId() + 1);
             }
 
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при загрузке файла", e);
         } catch (Exception e) {
-            throw new ManagerSaveException("Ошибка при разборе строки из файла", e); // ← важно!
+            throw new ManagerSaveException("Ошибка при разборе строки из файла", e);
         }
 
         return manager;
