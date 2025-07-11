@@ -33,14 +33,16 @@ public class Main {
         Epic epic2 = new Epic("Эпик без подзадач", "Описание эпика 2");
         manager.addEpic(epic2);
 
-        manager.getTaskById(task1.getId());
-        manager.getEpicById(epic1.getId());
-        manager.getSubtaskById(sub1.getId());
-        manager.getTaskById(task2.getId());
-        manager.getSubtaskById(sub2.getId());
-        manager.getSubtaskById(sub3.getId());
-        manager.getEpicById(epic2.getId());
-        manager.getTaskById(task1.getId());
+        manager.getTaskById(task1.getId()).ifPresent(System.out::println);
+        manager.getEpicById(epic1.getId()).ifPresent(System.out::println);
+        manager.getSubtaskById(sub1.getId()).ifPresent(System.out::println);
+
+        manager.getTaskById(task2.getId()).ifPresent(System.out::println);
+        manager.getSubtaskById(sub2.getId()).ifPresent(System.out::println);
+        manager.getSubtaskById(sub3.getId()).ifPresent(System.out::println);
+
+        manager.getEpicById(epic2.getId()).ifPresent(System.out::println);
+        manager.getTaskById(task1.getId()).ifPresent(System.out::println);
 
         printHistory(manager, "История после просмотров:");
 

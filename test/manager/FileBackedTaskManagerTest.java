@@ -12,8 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private File tempFile;
@@ -75,6 +74,22 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         inMemory.addTask(t1);
         fileBased.addTask(new Task("Задача", "Описание"));
         assertEquals(inMemory.getAllTasks(), fileBased.getAllTasks());
+    }
+
+    @Test
+    void shouldThrowWhenFileIsCorrupted() throws IOException {
+        File brokenFile = File.createTempFile("broken", ".csv");
+        java.nio.file.Files.writeString(brokenFile.toPath(), "id,type,name,status,description,epic,duration,startTime\nbroken,data,with,error");
+
+        assertThrows(RuntimeException.class, () -> FileBackedTaskManager.loadFromFile(brokenFile));
+    }
+
+
+    @Test
+    void getByIdShouldReturnEmptyIfTaskNotFound() {
+        assertTrue(manager.getTaskById(999).isEmpty());
+        assertTrue(manager.getEpicById(999).isEmpty());
+        assertTrue(manager.getSubtaskById(999).isEmpty());
     }
 
 

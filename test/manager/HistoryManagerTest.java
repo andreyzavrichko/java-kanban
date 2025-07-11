@@ -48,9 +48,9 @@ abstract class HistoryManagerTest<T extends HistoryManager> {
 
     @Test
     void removeShouldDeleteTaskFromHistory() {
-        Task task1 = new Task("T1", "D");
+        Task task1 = new Task("Task1", "Desc1");
         task1.setId(1);
-        Task task2 = new Task("T2", "D");
+        Task task2 = new Task("Task2", "Desc2");
         task2.setId(2);
 
         historyManager.add(task1);
@@ -69,17 +69,19 @@ abstract class HistoryManagerTest<T extends HistoryManager> {
 
     @Test
     void addingSameTaskShouldMoveItToEnd() {
-        Task task = new Task("Task", "Desc");
+        Task task = new Task("Task1", "Desc1");
         task.setId(1);
-        Task dummy = new Task("Dummy", "D");
-        dummy.setId(2);
+        Task task2 = new Task("Task2", "Desc2");
+        task2.setId(2);
 
         historyManager.add(task);
-        historyManager.add(dummy);
+        historyManager.add(task2);
         historyManager.add(task);
 
         List<Task> history = historyManager.getHistory();
         assertEquals(2, history.size());
         assertEquals(task, history.getLast());
     }
+
+
 }

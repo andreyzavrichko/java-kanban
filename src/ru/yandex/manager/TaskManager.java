@@ -5,6 +5,7 @@ import ru.yandex.tasks.Subtask;
 import ru.yandex.tasks.Task;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskManager {
     List<Task> getAllTasks();
@@ -19,11 +20,11 @@ public interface TaskManager {
 
     void deleteAllSubtasks();
 
-    Task getTaskById(Integer id);
+    Optional<Task> getTaskById(Integer id);
 
-    Epic getEpicById(Integer id);
+    Optional<Epic> getEpicById(Integer id);
 
-    Subtask getSubtaskById(Integer id);
+    Optional<Subtask> getSubtaskById(Integer id);
 
     void addTask(Task task);
 
@@ -46,4 +47,6 @@ public interface TaskManager {
     List<Subtask> getSubtasksOfEpic(Integer epicId);
 
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }
