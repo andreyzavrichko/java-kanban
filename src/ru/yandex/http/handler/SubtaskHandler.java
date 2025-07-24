@@ -1,0 +1,91 @@
+package ru.yandex.http.handler;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import ru.yandex.http.BaseHttpHandler;
+import ru.yandex.manager.TaskManager;
+import ru.yandex.tasks.Subtask;
+
+import java.io.IOException;
+import java.util.Optional;
+
+public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
+
+    private final TaskManager manager;
+    private final Gson gson;
+
+    public SubtaskHandler(TaskManager manager) {
+        this.manager = manager;
+        this.gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
+    }
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        try {
+            String method = exchange.getRequestMethod();
+            String path = exchange.getRequestURI().getPath();
+
+            if (method.equals("GET")) {
+                handleGet(exchange, path);
+            } else if (method.equals("POST")) {
+                handlePost(exchange);
+            } else if (method.equals("DELETE")) {
+                handleDelete(exchange, path);
+            } else {
+                sendNotFound(exchange, "Метод не поддерживается");
+            }
+
+        } catch (Exception e) {
+            sendServerError(exchange, "Ошибка сервера: " + e.getMessage());
+        }
+    }
+
+    private void handleGet(HttpExchange exchange, String path) throws IOException {
+        Integer id = parsePathId(path);
+        if (id != null) {
+            Optional<Subtask> subtask = manager.getSubtaskById(id);
+            if (subtask.isPresent()) {
+                sendText(exchange, gson.toJson(subtask.get()));
+            } else {
+                sendNotFound(exchange, "Подзадача с id=" + id + " не найдена");
+            }
+        } else {
+            sendText(exchange, gson.toJson(manager.getAllSubtasks()));
+        }
+    }
+
+    private void handlePost(HttpExchange exchange) throws IOException {
+        String body = readRequestBody(exchange);
+        Subtask subtask = gson.fromJson(body, Subtask.class);
+
+        try {
+            if (subtask.getId() == null || manager.getSubtaskById(subtask.getId()).isEmpty()) {
+                manager.addSubtask(subtask);
+            } else {
+                manager.updateSubtask(subtask);
+            }
+            sendCreated(exchange);
+        } catch (IllegalArgumentException e) {
+            sendHasOverlaps(exchange, "Подзадача пересекается по времени");
+        }
+    }
+
+    private void handleDelete(HttpExchange exchange, String path) throws IOException {
+        Integer id = parsePathId(path);
+        if (id != null) {
+            Optional<Subtask> subtask = manager.getSubtaskById(id);
+            if (subtask.isPresent()) {
+                manager.deleteSubtaskById(id);
+                sendText(exchange, "Удалена подзадача с id=" + id);
+            } else {
+                sendNotFound(exchange, "Подзадача не найдена");
+            }
+        } else {
+            sendNotFound(exchange, "Некорректный путь удаления");
+        }
+    }
+}
