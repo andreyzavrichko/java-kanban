@@ -1,10 +1,10 @@
 package ru.yandex.http.handler;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.http.BaseHttpHandler;
+import ru.yandex.http.HttpTaskServer;
 import ru.yandex.manager.TaskManager;
 import ru.yandex.tasks.Epic;
 
@@ -18,9 +18,7 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
 
     public EpicHandler(TaskManager manager) {
         this.manager = manager;
-        this.gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
+        this.gson = HttpTaskServer.getGson();
     }
 
     @Override
@@ -29,14 +27,11 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
             String method = exchange.getRequestMethod();
             String path = exchange.getRequestURI().getPath();
 
-            if (method.equals("GET")) {
-                handleGet(exchange, path);
-            } else if (method.equals("POST")) {
-                handlePost(exchange);
-            } else if (method.equals("DELETE")) {
-                handleDelete(exchange, path);
-            } else {
-                sendNotFound(exchange, "Метод не поддерживается");
+            switch (method) {
+                case "GET" -> handleGet(exchange, path);
+                case "POST" -> handlePost(exchange);
+                case "DELETE" -> handleDelete(exchange, path);
+                default -> sendNotFound(exchange, "Метод не поддерживается");
             }
 
         } catch (Exception e) {

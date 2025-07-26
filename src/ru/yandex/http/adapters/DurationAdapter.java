@@ -1,29 +1,28 @@
 package ru.yandex.http.adapters;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.*;
 
-import java.io.IOException;
+import java.lang.reflect.Type;
 import java.time.Duration;
 
-public class DurationAdapter extends TypeAdapter<Duration> {
+public class DurationAdapter implements JsonSerializer<Duration>, JsonDeserializer<Duration> {
     @Override
-    public void write(JsonWriter out, Duration value) throws IOException {
-        if (value == null) {
-            out.nullValue();
-        } else {
-            out.value(value.toMinutes());
+    public JsonElement serialize(Duration src, Type typeOfSrc, JsonSerializationContext context) {
+        if (src == null) {
+            return JsonNull.INSTANCE;
         }
+        return new JsonPrimitive(src.toString());
     }
 
     @Override
-    public Duration read(JsonReader in) throws IOException {
-        if (in.peek() == null) {
-            in.nextNull();
+    public Duration deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        if (json.isJsonNull()) {
             return null;
         }
-        long minutes = in.nextLong();
-        return Duration.ofMinutes(minutes);
+        try {
+            return Duration.parse(json.getAsString());
+        } catch (Exception e) {
+            throw new JsonParseException("Cannot parse Duration from: " + json.getAsString(), e);
+        }
     }
 }

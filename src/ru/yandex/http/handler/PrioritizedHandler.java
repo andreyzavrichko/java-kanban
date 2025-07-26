@@ -1,10 +1,10 @@
 package ru.yandex.http.handler;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.http.BaseHttpHandler;
+import ru.yandex.http.HttpTaskServer;
 import ru.yandex.manager.TaskManager;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
 
     public PrioritizedHandler(TaskManager manager) {
         this.manager = manager;
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = HttpTaskServer.getGson();
     }
 
     @Override

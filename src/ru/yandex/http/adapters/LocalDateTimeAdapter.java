@@ -1,28 +1,21 @@
 package ru.yandex.http.adapters;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.*;
 
-import java.io.IOException;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
-    private final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+public class LocalDateTimeAdapter implements JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     @Override
-    public void write(JsonWriter out, LocalDateTime value) throws IOException {
-        if (value == null) {
-            out.nullValue();
-        } else {
-            out.value(value.format(formatter));
-        }
+    public JsonElement serialize(LocalDateTime src, Type typeOfSrc, JsonSerializationContext context) {
+        return new JsonPrimitive(src.format(FORMATTER));
     }
 
     @Override
-    public LocalDateTime read(JsonReader in) throws IOException {
-        String value = in.nextString();
-        return LocalDateTime.parse(value, formatter);
+    public LocalDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        return LocalDateTime.parse(json.getAsString(), FORMATTER);
     }
 }

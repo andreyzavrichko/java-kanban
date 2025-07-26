@@ -1,10 +1,11 @@
 package ru.yandex.http.handler;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.http.BaseHttpHandler;
+import ru.yandex.http.HttpTaskServer;
 import ru.yandex.manager.TaskManager;
 import ru.yandex.tasks.Task;
 
@@ -18,9 +19,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
     public TaskHandler(TaskManager manager) {
         this.manager = manager;
-        this.gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
+        this.gson = HttpTaskServer.getGson();
     }
 
     @Override
@@ -38,8 +37,8 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             } else {
                 sendNotFound(exchange, "Метод не поддерживается");
             }
-
         } catch (Exception e) {
+            e.printStackTrace();
             sendServerError(exchange, "Ошибка сервера: " + e.getMessage());
         }
     }
@@ -60,17 +59,29 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
     private void handlePost(HttpExchange exchange) throws IOException {
         String body = readRequestBody(exchange);
-        Task task = gson.fromJson(body, Task.class);
-
         try {
+            Task task = gson.fromJson(body, Task.class);
+            System.out.println("Deserialized task: " + task);
+            if (task == null) {
+                sendNotFound(exchange, "Задача не может быть null");
+                return;
+            }
             if (task.getId() == null || manager.getTaskById(task.getId()).isEmpty()) {
-                manager.addTask(task);
+                manager.addTask(task); // Добавляем задачу
+                System.out.println("Task added with id: " + task.getId()); // Лог успешного добавления
             } else {
                 manager.updateTask(task);
             }
             sendCreated(exchange);
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+            sendServerError(exchange, "Ошибка парсинга JSON: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            sendHasOverlaps(exchange, "Задача пересекается по времени");
+            e.printStackTrace();
+            sendHasOverlaps(exchange, "Задача пересекается по времени: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendServerError(exchange, "Ошибка сервера: " + e.getMessage());
         }
     }
 

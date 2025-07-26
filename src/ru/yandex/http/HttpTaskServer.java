@@ -15,13 +15,12 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class HttpTaskServer {
-
     public static final int PORT = 8080;
     private final HttpServer server;
     private final TaskManager manager;
 
-    public HttpTaskServer() throws IOException {
-        this.manager = Managers.getDefault();
+    public HttpTaskServer(TaskManager manager) throws IOException {
+        this.manager = manager;
         this.server = HttpServer.create(new InetSocketAddress(PORT), 0);
         registerContexts();
     }
@@ -44,7 +43,7 @@ public class HttpTaskServer {
     }
 
     public static void main(String[] args) throws IOException {
-        HttpTaskServer httpServer = new HttpTaskServer();
+        HttpTaskServer httpServer = new HttpTaskServer(Managers.getDefault());
         httpServer.start();
     }
 
@@ -52,8 +51,7 @@ public class HttpTaskServer {
         return new GsonBuilder()
                 .registerTypeAdapter(Duration.class, new DurationAdapter())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .serializeNulls()
+                .setPrettyPrinting()
                 .create();
     }
-
 }
