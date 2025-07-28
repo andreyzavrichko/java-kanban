@@ -45,7 +45,7 @@ public class HttpTaskManagerTasksTest {
     public void testAddTask() throws IOException, InterruptedException {
         Task task = new Task("Description", "Name", NEW,
                 Duration.ofMinutes(5), LocalDateTime.now());
-        String taskJson = HttpTaskServer.getGson().toJson(task);
+        String taskJson = HttpTaskServer.GSON.toJson(task);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(baseUrl + "/tasks"))

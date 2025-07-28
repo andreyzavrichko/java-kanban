@@ -14,11 +14,10 @@ import java.util.Optional;
 public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
 
     private final TaskManager manager;
-    private final Gson gson;
+    private static final Gson gson = HttpTaskServer.GSON;
 
     public SubtaskHandler(TaskManager manager) {
         this.manager = manager;
-        this.gson = HttpTaskServer.getGson();
     }
 
     @Override

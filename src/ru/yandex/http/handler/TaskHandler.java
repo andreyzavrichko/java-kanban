@@ -15,11 +15,10 @@ import java.util.Optional;
 public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
     private final TaskManager manager;
-    private final Gson gson;
+    private static final Gson gson = HttpTaskServer.GSON;
 
     public TaskHandler(TaskManager manager) {
         this.manager = manager;
-        this.gson = HttpTaskServer.getGson();
     }
 
     @Override
@@ -28,11 +27,11 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             String method = exchange.getRequestMethod();
             String path = exchange.getRequestURI().getPath();
 
-            if (method.equals("GET")) {
+            if (method.equals(METHOD_GET)) {
                 handleGet(exchange, path);
-            } else if (method.equals("POST")) {
+            } else if (method.equals(METHOD_POST)) {
                 handlePost(exchange);
-            } else if (method.equals("DELETE")) {
+            } else if (method.equals(METHOD_DELETE)) {
                 handleDelete(exchange, path);
             } else {
                 sendNotFound(exchange, "Метод не поддерживается");

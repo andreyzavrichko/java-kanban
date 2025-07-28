@@ -44,7 +44,7 @@ public class HttpTaskManagerSubtasksTest {
         manager.addEpic(epic);
 
         Subtask subtask = new Subtask("Test Subtask", "Description", epic.getId());
-        String subtaskJson = HttpTaskServer.getGson().toJson(subtask);
+        String subtaskJson = HttpTaskServer.GSON.toJson(subtask);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(baseUrl + "/subtasks"))

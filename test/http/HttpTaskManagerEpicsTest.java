@@ -41,7 +41,7 @@ public class HttpTaskManagerEpicsTest {
     @Test
     public void testAddEpic() throws IOException, InterruptedException {
         Epic epic = new Epic("Test Epic", "Description");
-        String epicJson = HttpTaskServer.getGson().toJson(epic);
+        String epicJson = HttpTaskServer.GSON.toJson(epic);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(baseUrl + "/epics"))

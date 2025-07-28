@@ -4,47 +4,58 @@ import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 public abstract class BaseHttpHandler {
+    protected static final String METHOD_GET = "GET";
+    protected static final String METHOD_POST = "POST";
+    protected static final String METHOD_DELETE = "DELETE";
 
     protected void sendText(HttpExchange exchange, String text) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/json; charset=UTF-8");
         exchange.sendResponseHeaders(200, resp.length);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+        try (OutputStream os = exchange.getResponseBody()) {
+            os.write(resp);
+        }
     }
 
     protected void sendCreated(HttpExchange exchange) throws IOException {
         exchange.sendResponseHeaders(201, 0);
-        exchange.close();
+        try (OutputStream os = exchange.getResponseBody()) {
+            // Пустое тело, но поток должен быть закрыт
+        }
     }
 
     protected void sendNotFound(HttpExchange exchange, String message) throws IOException {
         byte[] resp = message.getBytes(StandardCharsets.UTF_8);
         exchange.sendResponseHeaders(404, resp.length);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+        try (OutputStream os = exchange.getResponseBody()) {
+            os.write(resp);
+        }
     }
 
     protected void sendHasOverlaps(HttpExchange exchange, String message) throws IOException {
         byte[] resp = message.getBytes(StandardCharsets.UTF_8);
         exchange.sendResponseHeaders(406, resp.length);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+        try (OutputStream os = exchange.getResponseBody()) {
+            os.write(resp);
+        }
     }
 
     protected void sendServerError(HttpExchange exchange, String message) throws IOException {
         byte[] resp = message.getBytes(StandardCharsets.UTF_8);
         exchange.sendResponseHeaders(500, resp.length);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+        try (OutputStream os = exchange.getResponseBody()) {
+            os.write(resp);
+        }
     }
 
     protected String readRequestBody(HttpExchange exchange) throws IOException {
-        InputStream is = exchange.getRequestBody();
-        return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        try (InputStream is = exchange.getRequestBody()) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
     protected Integer parsePathId(String path) {
